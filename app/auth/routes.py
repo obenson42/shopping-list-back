@@ -9,7 +9,7 @@ from flask_cors import CORS, cross_origin
 from werkzeug.urls import url_parse
 import json
 
-from app import db, cache
+from app import db
 from app.models import User
 from app.auth import bp
 from app.auth.forms import LoginForm, RegistrationForm

@@ -10,15 +10,17 @@ from flask_cors import CORS, cross_origin
 
 import datetime
 
-from app import db, cache
+from app import db
 from app.models import User, ShoppingItem
-from app.ShoppingList import ShoppingItemDB
+from app.forms import ShoppingItemForm
+from app.ShoppingItemDB import ShoppingItemDB
 
-bp = Blueprint('main', __name__)
-shoppingItemDB = ShoppingItemDB(db, cache)
+bp = Blueprint('main', __name__, template_folder='templates', static_folder='static')
+shoppingItemDB = ShoppingItemDB(db)
 
 @bp.route('/')
 @bp.route('/index')
+@login_required
 def index():
     html = render_template("home.html")
     return html
@@ -32,27 +34,27 @@ def index():
 @login_required
 @cross_origin()
 def get_all_items():
-    return shoppingItemDB.get_all()
+    return shoppingItemDB.get_all(current_user.user_id)
 
-# create new book
+# create new shopping item
 @bp.route('/item/', methods=['PUSH'])
 @login_required
 def item_create():
-    form = BookForm(request.form)
-    return shoppingItemDB.create(form)
+    form = ShoppingItemForm(request.form)
+    return shoppingItemDB.create(form, current_user.user_id)
 
-# update existing book
+# update existing shopping item
 @bp.route('/item/', methods=['PUT'])
 @login_required
 def item_update():
-    form = BookForm(request.form)
-    return shoppingItemDB.update(form)
+    form = ShoppingItemForm(request.form)
+    return shoppingItemDB.update(form, current_user.user_id)
  
-# delete existing book
+# delete existing shopping item
 @bp.route('/item/<int:id>', methods=['DELETE'])
 @login_required
 def item_delete(id):
-    return shoppingItemDB.delete(id)
+    return shoppingItemDB.delete(id, current_user.user_id)
 
 @bp.route('/favicon.ico') 
 def favicon(): 

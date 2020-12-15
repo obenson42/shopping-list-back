@@ -9,9 +9,8 @@ from app.utilities import jsonifyList
 class ShoppingItemDB:
     """ class to handle requests from api for shopping items """
 
-    def __init__(self, db, cache):
+    def __init__(self, db):
         self.db = db
-        self.cache = cache
         self.headers = {"Content-Type": "application/json"}
 
     # get all ShoppingItems for the given user_id, returns JSON formatted list
@@ -24,7 +23,7 @@ class ShoppingItemDB:
             self.headers)
 
     # create new shoppingitem from form data or ShoppingItem instance => JSON dictionary with success or fail status
-    def create(self, form, shoppingitem=None):
+    def create(self, shoppingitem, user_id):
         # add the shoppingitem
         self.db.session.add(shoppingitem)
         self.db.session.commit()
@@ -36,7 +35,7 @@ class ShoppingItemDB:
             self.headers)
 
     # update existing shoppingitem from ShoppingItem instance => JSON with success or fail status
-    def update(self, form, shoppingitem=None):
+    def update(self, shoppingitem, user_id):
         # check shoppingitem has id (so exists in db)
         if not shoppingitem.id:
             # return fail
@@ -57,7 +56,7 @@ class ShoppingItemDB:
             self.headers)
  
     # delete existing shoppingitem => JSON with success or fail status
-    def delete(self, id):
+    def delete(self, id, user_id):
         if not id:
             # return fail
             json = '{"id":' + str(id) + ', "operation":"delete", "status":"fail"}'

@@ -1,0 +1,39 @@
+{% block content %}
+<div class='row' id="page_items">
+    <form class='col-md-4 col-12 px-sm-1' id="item_entry">
+        <input type='hidden' id='item_id' value='0' />
+        <div id='fields' class='px-1 px-sm-2 px-md-3 px-lg-4 py-2 bg-light rounded-top'>
+            <div class='form-group mb-1 mb-md-3'>
+                <label for='item_title' class='mr-sm-2 mb-0 mb-sm-1'>Title</label>
+                <input type='text' class='form-control mb-sm-0 mb-2 mr-sm-2 px-sm-1 py-sm-0 item_field' id='item_title' required pattern='[A-Za-z\s]+' />
+                <span class="field-validation-valid" data-valmsg-for="item_title" data-valmsg-replace="true"></span>
+            </div>
+            <div class='form-group mb-1 mb-md-3'>
+                <label for='item_year' class='mr-sm-2 mb-0 mb-sm-1'>Year</label>
+                <input type='number' class='form-control mb-sm-0 mb-2 mr-sm-2 px-sm-1 py-sm-0 item_field' id='item_year' maxlength='4' pattern='[0-9]{4}' />
+            </div>
+        </div>
+        <div id='controls' class='container-fluid px-4 py-1 bg-light rounded-bottom'>
+            <div class='row d-flex justify-content-between'>
+                <button type='button' class='btn btn-outline-primary btn-sm mt-1 ' id="btn_view_all_items">View All</button>
+                <button type='button' class='btn btn-outline-primary btn-sm mt-1 ' id='btn_search' disabled>Search</button>
+                <div>
+                    <button type='button' class='btn btn-outline-primary btn-sm mt-1 ' id='btn_add_item' disabled>Add Item</button>
+                    <button type='button' class='btn btn-outline-primary btn-sm mt-1 ' id='btn_update_item' disabled>Update Item</button>
+                </div>
+            </div>
+            <div class='row d-flex justify-content-between mt-2'>
+                <button type='button' class='btn btn-outline-primary btn-sm mr-sm-2' id='btn_clear_form_item'>Clear Form</button>
+                <button type='button' class='btn btn-outline-danger btn-sm' id='btn_delete_item' disabled>Delete Item</button>
+            </div>
+        </div>
+    </form>
+    <table class='table table-hover col-md-8 col-12' id='item_list'>
+        <thead><tr><th>Title</th><th>Bought</th><th>Price</th></tr></thead>
+        <tbody>
+            <tr><td></td><td></td><td></td></tr>
+        </tbody>
+    </table>
+</div>
+<script src="{{ url_for('static', filename='ItemListItems.js') }}"></script>
+{% endblock %}
