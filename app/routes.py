@@ -21,7 +21,7 @@ shoppingItemDB = ShoppingItemDB(db)
 @bp.after_request
 def after_request(response):
     header = response.headers
-    header['Access-Control-Allow-Origin'] = 'https://obenson-shopping-list.herokuapp.com/' #'http://localhost:9000'
+    header['Access-Control-Allow-Origin'] = 'https://obenson-shopping-list.herokuapp.com' #'http://localhost:9000'
     return response
 
 @bp.route('/')
