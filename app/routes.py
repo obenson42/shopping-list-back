@@ -42,51 +42,46 @@ def index():
 @login_required
 @cross_origin()
 def get_all_items():
-    return shoppingItemDB.get_all(current_user.id)
+    return shoppingItemDB.get_all()
 
 # create new shopping item
-@bp.route('/item/', methods=['PUSH'])
+@bp.route('/item/', methods=['POST'])
 @login_required
 @cross_origin()
 def item_create():
     data = request.get_json()
     item = data["item"]
-    print("title: {}".format(item["title"]))
-    print("bought: {}".format(item["bought"]))
-    print("position: {}".format(item["position"]))
-    print("user_id: {}".format(current_user.get_id()))
-    shoppingItem = ShoppingItem(id=item["id"], title=item["title"], bought=item["bought"], position=item["position"], user_id=current_user.get_id())
+    shoppingItem = ShoppingItem(title=item["title"], bought=item["bought"], position=item["position"], user_id=current_user.get_id())
     return shoppingItemDB.create(shoppingItem)
 
 # update existing shopping item
-@bp.route('/item_update/', methods=['PUSH', 'POST', 'PUT'])
+@bp.route('/item_update/', methods=['POST'])
 @login_required
 @cross_origin()
 def item_update():
     data = request.get_json()
     item = data["item"]
-    print("title: {}".format(item["title"]))
-    print("bought: {}".format(item["bought"]))
-    print("position: {}".format(item["position"]))
-    print("user_id: {}".format(current_user.get_id()))
     shoppingItem = ShoppingItem(id=item["id"], title=item["title"], bought=item["bought"], position=item["position"], user_id=current_user.get_id())
     return shoppingItemDB.update(shoppingItem)
  
 # update existing shopping item's position (this will affect multiple items)
 # takes one item which is the one the user repositioned, other item's position can be worked out from that
-@bp.route('/reorder/', methods=['PUT'])
+@bp.route('/reorder/', methods=['POST'])
 @login_required
 @cross_origin()
 def reorder_items():
-    form = ShoppingItemForm(request.form)
-    return shoppingItemDB.reorder_items(form.id.data, form.position.data)
+    data = request.get_json()
+    item = data["item"]
+    return shoppingItemDB.reorder_items(item["id"], item["position"])
  
 # delete existing shopping item
-@bp.route('/item/<int:id>', methods=['DELETE'])
+@bp.route('/item/', methods=['DELETE'])
 @login_required
 @cross_origin()
-def item_delete(id):
-    return shoppingItemDB.delete(id, current_user.id)
+def item_delete():
+    data = request.get_json()
+    item = data["item"]
+    return shoppingItemDB.delete(item["id"])
 
 @bp.route('/favicon.ico') 
 def favicon(): 

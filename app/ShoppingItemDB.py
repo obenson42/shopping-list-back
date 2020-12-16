@@ -1,9 +1,11 @@
 """ API for CRUD methods on ShoppingItems """
 from flask import make_response
 from flask_api import status
+from flask_login import current_user
+from sqlalchemy import and_
 import datetime
 
-from app.models import ShoppingItem
+from app.models import ShoppingItem, User
 from app.utilities import jsonifyList
 
 class ShoppingItemDB:
@@ -14,8 +16,8 @@ class ShoppingItemDB:
         self.headers = {"Content-Type": "application/json"}
 
     # get all ShoppingItems for the given user_id, returns JSON formatted list
-    def get_all(self, user_id):
-        shoppingitems = ShoppingItem.query.order_by(ShoppingItem.position).all()
+    def get_all(self):
+        shoppingitems = ShoppingItem.query.filter(ShoppingItem.user_id==current_user.get_id()).order_by(ShoppingItem.position).all()
         json = jsonifyList(shoppingitems, "shopping_items")
         return make_response(
             json,
@@ -45,7 +47,7 @@ class ShoppingItemDB:
                 status.HTTP_404_NOT_FOUND,
                 self.headers)
         # update ShoppingItem in db
-        ShoppingItem.query.filter(ShoppingItem.id==shoppingitem.id).\
+        ShoppingItem.query.filter(ShoppingItem.user_id==current_user.get_id()).filter(ShoppingItem.id==shoppingitem.id).\
             update({ "title":shoppingitem.title, "bought":shoppingitem.bought, "position":shoppingitem.position })
         self.db.session.commit()
         # return success
@@ -56,7 +58,7 @@ class ShoppingItemDB:
             self.headers)
  
     # delete existing shoppingitem => JSON with success or fail status
-    def delete(self, id, user_id):
+    def delete(self, id):
         if not id:
             # return fail
             json = '{"id":' + str(id) + ', "operation":"delete", "status":"fail"}'
@@ -65,7 +67,7 @@ class ShoppingItemDB:
                 status.HTTP_404_NOT_FOUND,
                 self.headers)
         
-        ShoppingItem.query.filter(ShoppingItem.id == id).delete()
+        ShoppingItem.query.filter(ShoppingItem.user_id==current_user.get_id()).filter(ShoppingItem.id == id).delete()
         self.db.session.commit()
         # return success
         json = '{"id":' + str(id) + ', "operation":"delete", "status":"success"}'
@@ -85,9 +87,31 @@ class ShoppingItemDB:
                 status.HTTP_404_NOT_FOUND,
                 self.headers)
         # get existing item
+        old_item = ShoppingItem.query.filter(ShoppingItem.id==id).first()
         # hold onto old position
+        old_position = old_item.position
         # get all items from new position to old position (or vice versa)
-        # update each item with new position
+        if new_position > old_position:
+            start_position = old_position
+            end_position = new_position
+            items = ShoppingItem.query.filter(ShoppingItem.user_id==current_user.get_id()).filter(ShoppingItem.position.between(start_position+1, end_position)).order_by(ShoppingItem.position).all()
+            # update other items with new position
+            for item in items:
+                ShoppingItem.query.filter(ShoppingItem.id==item.id).update({ "position":start_position })
+                start_position += 1
+            # update moved item with new position
+            ShoppingItem.query.filter(ShoppingItem.id==id).update({ "position":new_position })
+        else:
+            start_position = new_position
+            end_position = old_position - 1
+            items = ShoppingItem.query.filter(ShoppingItem.user_id==current_user.get_id()).filter(ShoppingItem.position.between(start_position, end_position)).order_by(ShoppingItem.position).all()
+            # update moved item with new position
+            ShoppingItem.query.filter(ShoppingItem.id==id).update({ "position":new_position })
+            # update other items with new position
+            for item in items:
+                start_position += 1
+                ShoppingItem.query.filter(ShoppingItem.id==item.id).update({ "position":start_position })
+        self.db.session.commit()
         # return success
         json = '{"operation":"reorder", "status":"success"}'
         return make_response(

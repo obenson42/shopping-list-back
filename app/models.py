@@ -7,12 +7,13 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 import html
 import base64
+import random
+import string
 from app import db, login
 
 # function used by flask_login to get a user object
 @login.user_loader
 def load_user(id):
-    print("id:{}".format(id))
     return User.query.get(int(id))
 
 # function used by flask_login to load a user via api_key param or Bearer in the Authorization header
@@ -24,9 +25,10 @@ def load_user_from_request(request):
         api_key = request.form.get('api_key')
     if not api_key:
         data = request.get_json()
-        api_key = data["api_key"]
+        if data is not None and "api_key" in data.keys():
+            api_key = data["api_key"]
     if api_key:
-        user = User.query.filter_by(api_key=api_key).first()
+        user = User.query.filter(User.api_key==api_key).first()
         if user:
             return user
 
@@ -52,7 +54,7 @@ class User(UserMixin, db.Model):
     email = Column(String(128), index=True, unique=True)
     password = Column(String(128), nullable=False) # password will be hashed when it is set
     spending_limit = Column(Integer, default=0, nullable=False) # in pence
-    api_key = "not a sensible API key" # I should probably be using JSON Web Tokens for this!
+    api_key = Column(String(64), default=''.join(random.choice(string.ascii_lowercase) for i in range(10)) + str(datetime.datetime.now())) # only created for new users, will be overwritten from db for existig users
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -94,4 +96,4 @@ class ShoppingItem(db.Model):
         return json
 
     def __repr__(self):
-        return '<ShoppingItem: {}>'.format(self.surname)
+        return '<ShoppingItem: {} {}>'.format(self.id, self.title)

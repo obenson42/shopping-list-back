@@ -49,6 +49,39 @@ def login():
 
     return render_template('auth/login.html', title='Sign In', form=form)
 
+@bp.route('/api_register', methods=('GET', 'POST'))
+@cross_origin()
+def api_register():
+    if current_user.is_authenticated:
+        return current_user
+
+    data = json.loads(request.data.decode("utf-8"))
+    username = data["username"]
+    password = data["password"]
+    password2 = data["password2"]
+    if username != "" and password != "" and password == password2:
+        user = User.query.filter_by(username = username).first()
+        if user is not None:
+            # username is already in use
+            return make_response(
+                "{'user':'" + str(username) + "', status: 'already exists'}",
+                status.HTTP_404_NOT_FOUND,
+                {"Content-Type": "application/json"})
+        
+        user = User(username=username)
+        user.set_password(password)
+        db.session.add(user)
+        db.session.commit()
+        return make_response(
+            user.jsonify(),
+            status.HTTP_200_OK,
+            {"Content-Type": "application/json"})
+
+    return make_response(
+        "{}",
+        status.HTTP_401_UNAUTHORIZED,
+        {"Content-Type": "application/json"})
+
 @bp.route('/api_login', methods=('GET', 'POST'))
 @cross_origin()
 def api_login():

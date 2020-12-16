@@ -8,9 +8,18 @@ class ShoppingItem {
     }
 }
 
+class User {
+    constructor(id, username, api_key) {
+        this.id = id;
+        this.username = username;
+        this.api_key = api_key;
+    }
+}
+
 class ItemList {
     constructor() {
         this.allItems = [];
+        this.allUsers = [];
     }
 
     setContent(data) {
@@ -20,6 +29,15 @@ class ItemList {
             this.allItems.push(item);
         }
         this.displayList();
+    }
+
+    setUsers(data) {
+        this.allUsers = [];
+        for (let x of data) {
+            const item = new User(x["id"], x["username"], x["api_key"]);
+            this.allUsers.push(item);
+        }
+        this.displayUsers();
     }
 
     // button methods
@@ -49,6 +67,9 @@ class ItemList {
                     $(btn).prop("disabled", false);
                 }
             });
+        $.getJSON("/users/", function (data) {
+            self.setUsers(data["user_items"]);
+        })
     }
 
     addItem() {
@@ -254,6 +275,20 @@ class ItemList {
         // disable buttons dependent on a table row having been clicked
         $("#btn_update_item").prop("disabled", true);
         $("#btn_delete_item").prop("disabled", true);
+    }
+
+    // JSON to HTML functions
+    displayUsers() {
+        let out = "";
+        for (let i = 0; i < this.allUsers.length; i++) {
+            const item = this.allUsers[i];
+            out += '<tr id="user' + item.id + '">';
+            out += '<td>' + item.username + '</td>';
+            out += '<td>' + item.api_key + '</td>';
+            out += '</tr>';
+        }
+        $("#user_list").find("tbody").empty();
+        $("#user_list").find("tbody").append(out);
     }
 
     fillFieldsFromItem(item) {
