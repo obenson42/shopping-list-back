@@ -9,27 +9,35 @@ import html
 import base64
 from app import db, login
 
+# function used by flask_login to get a user object
 @login.user_loader
 def load_user(id):
+    print("id:{}".format(id))
     return User.query.get(int(id))
 
+# function used by flask_login to load a user via api_key param or Bearer in the Authorization header
 @login.request_loader
 def load_user_from_request(request):
     # first, try to login using the api_key url arg
     api_key = request.args.get('api_key')
+    if not api_key:
+        api_key = request.form.get('api_key')
+    if not api_key:
+        data = request.get_json()
+        api_key = data["api_key"]
     if api_key:
         user = User.query.filter_by(api_key=api_key).first()
         if user:
             return user
 
     # next, try to login using Basic Auth (I should probably be using JSON Web Tokens for this)
-    api_key = request.headers.get('ShoppingItemization')
+    api_key = request.headers.get('Authorization')
     if api_key:
         api_key = api_key.replace('Bearer ', '', 1)
-        #try:
-        #    api_key = base64.b64decode(api_key)
-        #except TypeError:
-        #    pass
+        try:
+            api_key = base64.b64decode(api_key)
+        except TypeError:
+            pass
         user = User.query.filter_by(api_key=api_key).first()
         if user:
             return user
@@ -42,9 +50,9 @@ class User(UserMixin, db.Model):
     id = Column(Integer, primary_key=True)
     username = Column(String(64), index=True, unique=True)
     email = Column(String(128), index=True, unique=True)
-    password = Column(String(128), nullable=False)
-    spending_limit = Column(Numeric(10, 2), nullable=False)
-    api_key = "not a sensible API key"
+    password = Column(String(128), nullable=False) # password will be hashed when it is set
+    spending_limit = Column(Integer, default=0, nullable=False) # in pence
+    api_key = "not a sensible API key" # I should probably be using JSON Web Tokens for this!
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -52,13 +60,15 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
+    # convert an instance to a JSON representation (for passing to front end)
+    # password is not included
     def jsonify(self):
-        json = '{"id":' + str(self.id)
-        json += ',"username":"' + html.escape(self.username) + '"'
+        json = '{{"id":{}'.format(self.id)
+        json += ',"username":"{}"'.format(html.escape(self.username))
         if self.email:
-            json += ',"email":"' + html.escape(self.email) + '"'
-        json += ',"spending_limit:"' + str(self.spending_limit)
-        json += ',"api_key":"' + self.api_key + '"'
+            json += ',"email":"{}"'.format(html.escape(self.email))
+        json += ',"spending_limit":{}'.format(self.spending_limit)
+        json += ',"api_key":"{}"'.format(self.api_key)
         json += '}'
         return json
 
@@ -69,16 +79,17 @@ class ShoppingItem(db.Model):
     __tablename__ = 'shopping_item'
     id = Column(Integer, primary_key=True)
     title = Column(String(256), nullable=False)
-    bought = Column(Boolean, nullable=False)
+    bought = Column(Integer, default=0, nullable=False) # 0 is not bought, 1 is bought (I was having problems with the Boolean column type)
     user_id = Column(Integer, index=True)
     position = Column(Integer, nullable=False)
 
+    # convert an instance to a JSON representation (for passing to front end)
+    # user_id is not included as it is not needed at the front end and would make the system less secure
     def jsonify(self):
-        json = '{"id":' + str(self.id)
-        json += ',"title":"' + html.escape(self.title) + '"'
-        json += ',"bought":"' + self.bought + '"'
-        json += ',"user_id:"' + str(self.user_id)
-        json += ',"position:"' + str(self.position)
+        json = '{{"id":{}'.format(self.id)
+        json += ',"title":"{}"'.format(html.escape(self.title))
+        json += ',"bought":"{}"'.format(self.bought)
+        json += ',"position":{}'.format(self.position)
         json += '}'
         return json
 

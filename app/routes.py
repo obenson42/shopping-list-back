@@ -18,6 +18,14 @@ from app.ShoppingItemDB import ShoppingItemDB
 bp = Blueprint('main', __name__, template_folder='templates', static_folder='static')
 shoppingItemDB = ShoppingItemDB(db)
 
+@bp.after_request
+def after_request(response):
+    header = response.headers
+    header['Access-Control-Allow-Origin'] = 'http://localhost:9000'
+    #header['Access-Control-Allow-Methods'] = 'PUSH,PUT,POST'
+    #header['Access-Control-Allow-Credentials'] = True
+    return response
+
 @bp.route('/')
 @bp.route('/index')
 @login_required
@@ -34,27 +42,51 @@ def index():
 @login_required
 @cross_origin()
 def get_all_items():
-    return shoppingItemDB.get_all(current_user.user_id)
+    return shoppingItemDB.get_all(current_user.id)
 
 # create new shopping item
 @bp.route('/item/', methods=['PUSH'])
 @login_required
+@cross_origin()
 def item_create():
-    form = ShoppingItemForm(request.form)
-    return shoppingItemDB.create(form, current_user.user_id)
+    data = request.get_json()
+    item = data["item"]
+    print("title: {}".format(item["title"]))
+    print("bought: {}".format(item["bought"]))
+    print("position: {}".format(item["position"]))
+    print("user_id: {}".format(current_user.get_id()))
+    shoppingItem = ShoppingItem(id=item["id"], title=item["title"], bought=item["bought"], position=item["position"], user_id=current_user.get_id())
+    return shoppingItemDB.create(shoppingItem)
 
 # update existing shopping item
-@bp.route('/item/', methods=['PUT'])
+@bp.route('/item_update/', methods=['PUSH', 'POST', 'PUT'])
 @login_required
+@cross_origin()
 def item_update():
+    data = request.get_json()
+    item = data["item"]
+    print("title: {}".format(item["title"]))
+    print("bought: {}".format(item["bought"]))
+    print("position: {}".format(item["position"]))
+    print("user_id: {}".format(current_user.get_id()))
+    shoppingItem = ShoppingItem(id=item["id"], title=item["title"], bought=item["bought"], position=item["position"], user_id=current_user.get_id())
+    return shoppingItemDB.update(shoppingItem)
+ 
+# update existing shopping item's position (this will affect multiple items)
+# takes one item which is the one the user repositioned, other item's position can be worked out from that
+@bp.route('/reorder/', methods=['PUT'])
+@login_required
+@cross_origin()
+def reorder_items():
     form = ShoppingItemForm(request.form)
-    return shoppingItemDB.update(form, current_user.user_id)
+    return shoppingItemDB.reorder_items(form.id.data, form.position.data)
  
 # delete existing shopping item
 @bp.route('/item/<int:id>', methods=['DELETE'])
 @login_required
+@cross_origin()
 def item_delete(id):
-    return shoppingItemDB.delete(id, current_user.user_id)
+    return shoppingItemDB.delete(id, current_user.id)
 
 @bp.route('/favicon.ico') 
 def favicon(): 

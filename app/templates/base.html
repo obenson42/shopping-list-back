@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>{% block title %}{% endblock %} - Book List</title>
+    <title>{% block title %}{% endblock %} - Shopping List</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
@@ -11,13 +11,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script src="https://kit.fontawesome.com/9b65bfd06a.js" crossorigin="anonymous"></script>
-    <script src="{{ url_for('static', filename='jquery.caret.js') }}"></script>
-    <script src="{{ url_for('static', filename='BookList.js') }}"></script>
+    <script src="{{ url_for('static', filename='ShoppingList.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}" />
 </head>
 <body>
     <header class="container-fluid bg-primary">
-        <h1 class="text-light pb-1">Book List {% block header %}{% endblock %}</h1>
+        <h1 class="text-light pb-1">Shopping List {% block header %}{% endblock %}</h1>
     </header>
     {% for message in get_flashed_messages() %}
       <div class="alert alert-danger">
@@ -27,9 +26,7 @@
     <nav>
         {% if current_user.is_authenticated %}
         <ul class="nav nav-tabs">
-            <li class="nav-item"><a class="nav-link active" href="#" id="link_books">Books</a></li>
-            <li class="nav-item"><a class="nav-link" href="#" id="link_authors">Authors</a></li>
-            <li class="nav-item"><a class="nav-link" href="#" id="link_publishers">Publishers</a></li>
+            <li class="nav-item"><a class="nav-link active" href="#" id="link_items">Shopping Items</a></li>
         </ul>
         {% endif %}
         <ul class="nav nav-tabs" id="login">

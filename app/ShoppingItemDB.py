@@ -15,7 +15,7 @@ class ShoppingItemDB:
 
     # get all ShoppingItems for the given user_id, returns JSON formatted list
     def get_all(self, user_id):
-        shoppingitems = ShoppingItem.query.all()
+        shoppingitems = ShoppingItem.query.order_by(ShoppingItem.position).all()
         json = jsonifyList(shoppingitems, "shopping_items")
         return make_response(
             json,
@@ -23,7 +23,7 @@ class ShoppingItemDB:
             self.headers)
 
     # create new shoppingitem from form data or ShoppingItem instance => JSON dictionary with success or fail status
-    def create(self, shoppingitem, user_id):
+    def create(self, shoppingitem):
         # add the shoppingitem
         self.db.session.add(shoppingitem)
         self.db.session.commit()
@@ -35,7 +35,7 @@ class ShoppingItemDB:
             self.headers)
 
     # update existing shoppingitem from ShoppingItem instance => JSON with success or fail status
-    def update(self, shoppingitem, user_id):
+    def update(self, shoppingitem):
         # check shoppingitem has id (so exists in db)
         if not shoppingitem.id:
             # return fail
@@ -69,6 +69,27 @@ class ShoppingItemDB:
         self.db.session.commit()
         # return success
         json = '{"id":' + str(id) + ', "operation":"delete", "status":"success"}'
+        return make_response(
+            json,
+            status.HTTP_200_OK,
+            self.headers)
+
+    # update the given item's position and all other items between new and old positions => JSON with success or fail status
+    def reorder_items(self, id, new_position):
+        # check shoppingitem has id (so exists in db)
+        if not id:
+            # return fail
+            json = '{"id":' + str(id) + ', "operation":"update author", "status":"fail"}'
+            return make_response(
+                json,
+                status.HTTP_404_NOT_FOUND,
+                self.headers)
+        # get existing item
+        # hold onto old position
+        # get all items from new position to old position (or vice versa)
+        # update each item with new position
+        # return success
+        json = '{"operation":"reorder", "status":"success"}'
         return make_response(
             json,
             status.HTTP_200_OK,

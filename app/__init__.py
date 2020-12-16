@@ -11,7 +11,7 @@ from blinker import signal
 from config import Config
 
 class CustomSessionInterface(SecureCookieSessionInterface):
-    """Prevent creating session from API requests."""
+    """ Prevent creating session from API requests. """
     def save_session(self, *args, **kwargs):
         if g.get('login_via_header'):
             return
@@ -30,7 +30,7 @@ def create_app(config_class=Config):
     app = Flask(__name__)
     app.config.from_object(config_class)
     
-    app.session_interface = CustomSessionInterface()
+    #app.session_interface = CustomSessionInterface()
 
     login.init_app(app)
     login.login_view = 'auth.login'
