@@ -66,7 +66,7 @@ class ShoppingItemDB:
                 json,
                 status.HTTP_404_NOT_FOUND,
                 self.headers)
-        
+
         ShoppingItem.query.filter(ShoppingItem.user_id==current_user.get_id()).filter(ShoppingItem.id == id).delete()
         self.db.session.commit()
         # return success
