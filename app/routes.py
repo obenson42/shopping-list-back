@@ -21,8 +21,8 @@ shoppingItemDB = ShoppingItemDB(db)
 @bp.after_request
 def after_request(response):
     header = response.headers
-    header['Access-Control-Allow-Origin'] = 'https://obenson-shopping-list.herokuapp.com'
-    #header['Access-Control-Allow-Origin'] = 'http://localhost:9000'
+    #header['Access-Control-Allow-Origin'] = 'https://obenson-shopping-list.herokuapp.com'
+    header['Access-Control-Allow-Origin'] = 'http://localhost:9000'
     return response
 
 @bp.route('/')
@@ -50,7 +50,7 @@ def get_all_items():
 def item_create():
     data = request.get_json()
     item = data["item"]
-    shoppingItem = ShoppingItem(title=item["title"], bought=item["bought"], position=item["position"], user_id=current_user.get_id())
+    shoppingItem = ShoppingItem(title=item["title"], bought=int(item["bought"]), position=item["position"], user_id=current_user.get_id())
     return shoppingItemDB.create(shoppingItem)
 
 # update existing shopping item
