@@ -50,7 +50,7 @@ def get_all_items():
 def item_create():
     data = request.get_json()
     item = data["item"]
-    shoppingItem = ShoppingItem(title=item["title"], bought=int(item["bought"]), position=item["position"], user_id=current_user.get_id())
+    shoppingItem = ShoppingItem(title=item["title"], bought=(item["bought"] == 0), position=item["position"], user_id=current_user.get_id())
     return shoppingItemDB.create(shoppingItem)
 
 # update existing shopping item
