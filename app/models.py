@@ -84,6 +84,7 @@ class ShoppingItem(db.Model):
     bought = Column(Integer, default=0, nullable=False) # 0 is not bought, 1 is bought (I was having problems with the Boolean column type)
     user_id = Column(Integer, index=True)
     position = Column(Integer, nullable=False)
+    price = Column(Integer, nullable=True)
 
     # convert an instance to a JSON representation (for passing to front end)
     # user_id is not included as it is not needed at the front end and would make the system less secure
@@ -92,6 +93,8 @@ class ShoppingItem(db.Model):
         json += ',"title":"{}"'.format(html.escape(self.title))
         json += ',"bought":1' if (self.bought == True or self.bought == 1) else ',"bought":0'
         json += ',"position":{}'.format(self.position)
+        if self.price:
+            json += ',"price":{}'.format(self.price)
         json += '}'
         return json
 
