@@ -10,7 +10,6 @@ from flask_cors import CORS, cross_origin
 from flask_api import status
 
 import datetime
-import random
 
 from app import db
 from app.models import User, ShoppingItem
@@ -52,7 +51,7 @@ def get_all_items():
 def item_create():
     data = request.get_json()
     item = data["item"]
-    shoppingItem = ShoppingItem(title=item["title"], bought=(item["bought"] == 0), position=item["position"], user_id=current_user.get_id())
+    shoppingItem = ShoppingItem(title=item["title"], bought=item["bought"], position=item["position"], user_id=current_user.get_id())
     return shoppingItemDB.create(shoppingItem)
 
 # update existing shopping item
@@ -83,22 +82,6 @@ def item_delete():
     data = request.get_json()
     item = data["item"]
     return shoppingItemDB.delete(item["id"])
-
-# replacement for Tesco API until they allow access again
-@bp.route('/products/', methods=['GET'])
-@cross_origin()
-def get_products():
-    query = request.args.get('query')
-    if query.lower() == 'carrots':
-        json = '{"uk": {"ghs": {"products": {"results": [{"id": 1, "title": "Tesco Carrots Loose", "price": 1.13}, {"id": 2, "title": "Organic carrots", "price": 3.12}]}}}}'
-    elif query.lower() == 'leeks':
-        json = '{"uk": {"ghs": {"products": {"results": [{"id": 11, "title": "Tesco Leeks Loose", "price": 1.27}, {"id": 12, "title": "Organic leeks", "price": 3.76}, {"id": 13, "title": "Leeks (3 pk)", "price": 3.30}]}}}}'
-    else:
-        json = '{"uk": {"ghs": {"products": {"results": [{"id": ' + str(random.randrange(1, 1000)) + ', "title": "' + query + '", "price": ' + str(random.randrange(1, 1000) / 100.0) + '}]}}}}'
-    return make_response(
-        json,
-        status.HTTP_200_OK,
-        {"Content-Type": "application/json"})
 
 
 @bp.route('/favicon.ico') 

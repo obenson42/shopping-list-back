@@ -14,7 +14,7 @@ from app.models import User
 from app.auth import bp
 from app.auth.forms import LoginForm, RegistrationForm
 
-@bp.route('/register', methods=('GET', 'POST'))
+@bp.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
@@ -29,7 +29,7 @@ def register():
 
     return render_template('auth/register.html', title='Register', form=form)
 
-@bp.route('/login', methods=('GET', 'POST'))
+@bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
         return redirect(url_for("main.index"))
@@ -49,7 +49,7 @@ def login():
 
     return render_template('auth/login.html', title='Sign In', form=form)
 
-@bp.route('/api_register', methods=('GET', 'POST'))
+@bp.route('/api_register', methods=['GET', 'POST'])
 @cross_origin()
 def api_register():
     if current_user.is_authenticated:
@@ -82,7 +82,7 @@ def api_register():
         status.HTTP_401_UNAUTHORIZED,
         {"Content-Type": "application/json"})
 
-@bp.route('/api_login', methods=('GET', 'POST'))
+@bp.route('/api_login', methods=['GET', 'POST'])
 @cross_origin()
 def api_login():
     if current_user.is_authenticated:
@@ -96,12 +96,12 @@ def api_login():
         if user is None:
             return make_response(
                 "{'user':'" + str(username) + "'}",
-                status.HTTP_404_NOT_FOUND,
+                status.HTTP_401_UNAUTHORIZED,
                 {"Content-Type": "application/json"})
         if not user.check_password(password):
             return make_response(
                 "{'password':'wrong'}",
-                status.HTTP_404_NOT_FOUND,
+                status.HTTP_401_UNAUTHORIZED,
                 {"Content-Type": "application/json"})
 
         login_user(user)

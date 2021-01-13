@@ -1,0 +1,20 @@
+[
+    {"name": "carrot", "results": [
+        {"id": 1, "title": "Tesco Carrots Loose", "price": 1.13},
+        {"id": 2, "title": "Organic Carrots", "price": 3.12}
+        ]
+    },
+    {"name": "leek", "results": [
+        {"id": 11, "title": "Tesco Leeks Loose", "price": 1.27}, 
+        {"id": 12, "title": "Organic Leeks", "price": 3.76}, 
+        {"id": 13, "title": "Leeks (3 pk)", "price": 3.30}
+        ]
+    },
+    {"name": "potato", "results": [
+        {"id": 21, "title": "Potatoes 1kg", "price": 1.13},
+        {"id": 22, "title": "Baby Potatoes", "price": 2.27},
+        {"id": 23, "title": "Marris Piper Potatoes", "price": 2.89},
+        {"id": 24, "title": "Baking Potatoes", "price": 1.50}
+        ]
+    }
+]
