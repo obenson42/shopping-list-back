@@ -1,8 +1,8 @@
-"""initial migration
+"""empty message
 
-Revision ID: 4b94472bbb1d
+Revision ID: 47063a152ce7
 Revises: 
-Create Date: 2020-12-15 14:07:38.148028
+Create Date: 2021-01-13 17:55:30.118358
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '4b94472bbb1d'
+revision = '47063a152ce7'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -21,9 +21,10 @@ def upgrade():
     op.create_table('shopping_item',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=256), nullable=False),
-    sa.Column('bought', sa.Boolean(), nullable=False),
+    sa.Column('bought', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('position', sa.Integer(), nullable=False),
+    sa.Column('price', sa.Integer(), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_shopping_item_user_id'), 'shopping_item', ['user_id'], unique=False)
@@ -32,7 +33,8 @@ def upgrade():
     sa.Column('username', sa.String(length=64), nullable=True),
     sa.Column('email', sa.String(length=128), nullable=True),
     sa.Column('password', sa.String(length=128), nullable=False),
-    sa.Column('spending_limit', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('spending_limit', sa.Integer(), nullable=False),
+    sa.Column('api_key', sa.String(length=64), nullable=True),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_user_stuff_email'), 'user_stuff', ['email'], unique=True)

@@ -91,7 +91,7 @@ class ShoppingItem(db.Model):
     def jsonify(self):
         json = '{{"id":{}'.format(self.id)
         json += ',"title":"{}"'.format(html.escape(self.title))
-        json += ',"bought":1' if (self.bought == True or self.bought == 1) else ',"bought":0'
+        json += ',"bought":{}'.format(self.bought)
         json += ',"position":{}'.format(self.position)
         if self.price:
             json += ',"price":{}'.format(self.price)
