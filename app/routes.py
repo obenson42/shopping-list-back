@@ -30,7 +30,6 @@ def after_request(response):
 @bp.route('/index')
 @login_required
 def index():
-    db.drop_all()
     html = render_template("home.html")
     return html
 
