@@ -1,3 +1,4 @@
+"""common routes for the ShoppingList backend, with CORS access control header"""
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 

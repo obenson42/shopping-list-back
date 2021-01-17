@@ -1,3 +1,4 @@
+"""routes for authentication (login and registration) from session or API"""
 import functools
 
 from flask import (
